@@ -35,8 +35,6 @@ class: cover-dark
 
 ---
 
-<div class="eyebrow"><carbon-dashboard /> Tổng quan</div>
-
 # Tiến độ 2 tuần đầu
 
 <div class="grid grid-cols-4 gap-3 mb-4">
@@ -98,8 +96,6 @@ class: sec-w1
 
 ---
 
-<div class="eyebrow"><carbon-flag /> Tuần 1 · Tổng quan</div>
-
 # Mục tiêu Tuần 1 và tiêu chí đầu ra
 
 | # | Chủ đề | Tiêu chí đầu ra (theo roadmap) |
@@ -119,53 +115,46 @@ class: sec-w1
 
 ---
 
-<div class="eyebrow"><logos-linux-tux /> Tuần 1 · 1/6 · Linux tài nguyên</div>
-
 # CPU và Load Average
 
 <div class="grid grid-cols-2 gap-4">
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-3">
 <div class="card accent small">
 
 ### <carbon-chip /> Cấu trúc CPU
 
-- **Socket → Core → Thread:** Hyper-Threading cho mỗi core 2 thread. Linux coi mỗi thread là 1 **CPU logic** (`lscpu`, `nproc`)
-- **CPU time:** <span class="chip">us</span> ứng dụng <span class="chip">sy</span> kernel <span class="chip">ni</span> process đã nice <span class="chip">id</span> rảnh <span class="chip">wa</span> chờ disk <span class="chip">st</span> hypervisor lấy cho VM khác
+- **Socket → Core → Thread.** Mỗi thread là 1 **CPU logic** (`nproc`)
+- **CPU time:** <span class="chip">us</span> ứng dụng · <span class="chip">sy</span> kernel · <span class="chip">wa</span> chờ disk · <span class="chip">st</span> bị VM khác lấy
 
 </div>
 <div class="card accent small">
 
 ### <carbon-meter /> Load average (1 · 5 · 15 phút)
 
-Số process trung bình **đang chạy hoặc chờ CPU** cộng với số process đang chờ I/O (trạng thái `D`). Đem so với số CPU logic:
-- Load **4.0** trên máy 4 CPU = đầy tải 100%
-- Load **8.0** trên máy 4 CPU = hàng đợi gấp đôi
+- Số process đang chạy hoặc chờ CPU/I/O
+- So với số CPU logic: **load = số CPU** là đầy tải, **gấp đôi** là quá tải
 
 </div>
 </div>
-<div>
+<div class="flex flex-col gap-3">
 
 ```bash
-lscpu | grep -E "^CPU\(s\)|Thread|Core|Socket"
-uptime              # load average: 0.52, 0.40, 0.31
-top                 # nhấn 1: từng CPU · P: sắp theo CPU
-mpstat -P ALL 1 3   # thống kê từng core (sysstat)
-vmstat 1 5          # r = hàng đợi CPU, wa = chờ I/O
+nproc ; uptime        # số CPU · load average
+top                   # nhấn 1 để xem từng CPU
+mpstat -P ALL 1 3     # thống kê từng core
 ```
 
-| Hiện tượng | Ý nghĩa | Hướng xử lý |
-|---|---|---|
-| `us` cao | Ứng dụng tính toán nặng | Tối ưu code, thêm vCPU |
-| `sy` cao | Nhiều system call | `pidstat -w`, xem số thread |
-| `wa` cao | CPU rảnh, chờ disk | Điều tra disk, không phải thiếu CPU |
-| `st` cao | Host bị overcommit | Báo đội hạ tầng, migrate VM |
+| Chỉ số cao | Nguyên nhân → Xử lý |
+|---|---|
+| `us` | App tính toán nặng → tối ưu, thêm vCPU |
+| `sy` | Nhiều system call → kiểm tra thread |
+| `wa` | Chờ disk → điều tra disk, không phải thiếu CPU |
+| `st` | Host quá tải → migrate VM |
 
 </div>
 </div>
 
 ---
-
-<div class="eyebrow"><logos-linux-tux /> Tuần 1 · 1/6 · Linux tài nguyên</div>
 
 # Bộ nhớ (RAM, swap) và Disk
 
@@ -218,8 +207,6 @@ lsof +L1                # file đã xoá nhưng còn bị giữ
 
 ---
 
-<div class="eyebrow"><logos-linux-tux /> Tuần 1 · 1/6 · Linux tài nguyên</div>
-
 # Process, giới hạn tài nguyên và phương pháp USE
 
 <div class="grid grid-cols-2 gap-4">
@@ -262,8 +249,6 @@ sudo systemctl set-property nginx.service \
 <div class="outcome">🎯 <span><b>Đầu ra:</b> Kiểm tra và phân bổ được tài nguyên; giải thích được cho người khác</span></div>
 
 ---
-
-<div class="eyebrow"><carbon-network-3 /> Tuần 1 · 2/6 · Network</div>
 
 # Địa chỉ IP, CIDR và routing
 
@@ -312,8 +297,6 @@ sysctl -w net.ipv4.ip_forward=1   # Linux làm router
 </div>
 
 ---
-
-<div class="eyebrow"><carbon-network-3 /> Tuần 1 · 2/6 · Network</div>
 
 # Cấu hình IP vĩnh viễn và DNS
 
@@ -368,8 +351,6 @@ getent hosts vm-db       # đi qua nsswitch (cả /etc/hosts)
 
 ---
 
-<div class="eyebrow"><carbon-network-3 /> Tuần 1 · 2/6 · Network</div>
-
 # Mạng ảo cho VM và sơ đồ Lab
 
 <div class="grid grid-cols-2 gap-4">
@@ -416,8 +397,6 @@ flowchart LR
 
 ---
 
-<div class="eyebrow"><carbon-data-base /> Tuần 1 · 3/6 · Storage</div>
-
 # Chuỗi lưu trữ, partition và LVM
 
 ```mermaid {scale: 0.6}
@@ -457,8 +436,6 @@ parted /dev/sdb --script mklabel gpt \
 </div>
 
 ---
-
-<div class="eyebrow"><carbon-data-base /> Tuần 1 · 3/6 · Storage</div>
 
 # Thực hành LVM, filesystem và /etc/fstab
 
@@ -513,8 +490,6 @@ thiết bị · mount point · loại FS · options (`defaults`, `noatime`, `nof
 
 ---
 
-<div class="eyebrow"><carbon-security /> Tuần 1 · 4/6 · Permission</div>
-
 # User, group và quyền cơ bản rwx
 
 <div class="grid grid-cols-2 gap-4">
@@ -567,8 +542,6 @@ umask      # 0022 → file mới 644, thư mục mới 755
 
 ---
 
-<div class="eyebrow"><carbon-security /> Tuần 1 · 4/6 · Permission</div>
-
 # Quyền đặc biệt, ACL và sudo
 
 <div class="grid grid-cols-2 gap-4">
@@ -619,8 +592,6 @@ sudo -l -U luc        # xem user được phép chạy gì
 <div class="outcome">🎯 <span><b>Đầu ra:</b> Tạo và phân quyền được theo đúng yêu cầu của ứng dụng</span></div>
 
 ---
-
-<div class="eyebrow"><carbon-settings-services /> Tuần 1 · 5/6 · systemd & firewall</div>
 
 # systemd và vòng đời dịch vụ
 
@@ -678,8 +649,6 @@ WantedBy=multi-user.target
 
 ---
 
-<div class="eyebrow"><carbon-firewall /> Tuần 1 · 5/6 · systemd & firewall</div>
-
 # Firewall và kiểm tra port từ đầu đến cuối
 
 <div class="grid grid-cols-2 gap-4">
@@ -731,8 +700,6 @@ systemd cho dịch vụ vào ca khi boot (<b>enable</b>), tự gọi lại khi d
 <div class="outcome">🎯 <span><b>Đầu ra:</b> Quản lý được vòng đời dịch vụ; mở/đóng port theo yêu cầu</span></div>
 
 ---
-
-<div class="eyebrow"><carbon-virtual-machine /> Tuần 1 · 6/6 · Hypervisor</div>
 
 # Hypervisor là gì?
 
@@ -788,8 +755,6 @@ Cấp tổng vCPU/RAM cho các VM vượt tài nguyên thật. **vCPU 3–4:1** 
 
 ---
 
-<div class="eyebrow"><carbon-virtual-machine /> Tuần 1 · 6/6 · Hypervisor</div>
-
 # Vòng đời VM và thao tác trên các nền tảng
 
 ```mermaid {scale: 0.58}
@@ -828,8 +793,6 @@ virsh undefine vm-web2 --remove-all-storage
 
 ---
 
-<div class="eyebrow"><carbon-virtual-machine /> Tuần 1 · 6/6 · Hypervisor</div>
-
 # Snapshot và Backup không phải là một
 
 <div class="grid grid-cols-5 gap-4">
@@ -866,8 +829,6 @@ Hypervisor là ban quản lý chia căn hộ (VM). <b>Snapshot</b> là chụp �
 
 ---
 
-<div class="eyebrow"><carbon-debug /> Tuần 1 · Áp dụng</div>
-
 # Troubleshooting nhanh
 
 | Triệu chứng | Kiểm tra | Hướng xử lý |
@@ -901,8 +862,6 @@ class: sec-w2
 </div>
 
 ---
-
-<div class="eyebrow t2"><logos-docker-icon /> Tuần 2 · Chủ đề 7</div>
 
 # Container hoạt động như thế nào?
 
@@ -941,8 +900,6 @@ Container không phải máy ảo. Đó là tiến trình chạy trên **kernel 
 <div class="outcome">🎯 <span><b>Đầu ra:</b> Giải thích được cơ chế container và khác biệt so với VM trong 5 phút</span></div>
 
 ---
-
-<div class="eyebrow t2"><logos-docker-icon /> Tuần 2 · Chủ đề 7</div>
 
 # Image và Registry
 
@@ -997,8 +954,6 @@ docker push registry.company.vn/team/webapp:1.4.2
 
 ---
 
-<div class="eyebrow t2"><logos-docker-icon /> Tuần 2 · Chủ đề 7</div>
-
 # Volume, network và resource limit
 
 <div class="grid grid-cols-3 gap-3">
@@ -1047,8 +1002,6 @@ docker stats                     # theo dõi CPU/RAM thực tế của từng co
 ```
 
 ---
-
-<div class="eyebrow"><carbon-task-complete /> Tổng kết</div>
 
 # Kết quả đạt được sau 2 tuần
 

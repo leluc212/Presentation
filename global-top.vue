@@ -1,14 +1,15 @@
 <template>
   <footer
-    v-if="!['cover', 'section', 'end'].includes($nav.currentLayout)"
+    v-if="!['cover', 'end'].includes($nav.currentLayout)"
     class="lpc-footer"
+    :class="{ 'lpc-footer-dark': $nav.currentLayout === 'section' }"
   >
     <div class="lpc-progress">
       <div class="lpc-progress-bar" :style="{ width: (($nav.currentPage / $nav.total) * 100) + '%' }" />
     </div>
     <div class="lpc-footer-row">
       <span>Báo cáo tiến độ · Tuần 1 &amp; 2 · Linux → Container</span>
-      <span>{{ $nav.currentPage }} / {{ $nav.total }}</span>
+      <span>Lê Tấn Lực - Đỗ Hoàng Hiếu · {{ $nav.currentPage }} / {{ $nav.total }}</span>
     </div>
   </footer>
 </template>
@@ -39,5 +40,14 @@
   align-items: center;
   font-size: 10px;
   color: #9aa1b5;
+}
+.lpc-footer-dark {
+  background: transparent;
+}
+.lpc-footer-dark .lpc-progress {
+  background: rgba(255, 255, 255, 0.12);
+}
+.lpc-footer-dark .lpc-footer-row {
+  color: rgba(255, 255, 255, 0.6);
 }
 </style>
