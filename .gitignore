@@ -4,3 +4,6 @@ dist/
 *.log
 .kiro/
 v*/
+r*/
+PLAN-*.md
+/Tu*Linux*Virtualization.pdf

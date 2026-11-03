@@ -1,173 +1,239 @@
+/* ============ Palette: sáng dịu (phương án A) ============ */
 :root {
-  --navy: #0f172a;
-  --ink: #1e293b;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --w1: #2563eb;
-  --w1-soft: #eff6ff;
-  --w2: #0d9488;
-  --w2-soft: #f0fdfa;
-  --ok: #16a34a;
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --line: #e6e8f0;
+  --ink: #2b3245;
+  --head: #232a3d;
+  --muted: #6b7280;
+
+  --w1: #5b6cff;        /* indigo dịu – Tuần 1 */
+  --w1-soft: #eef0ff;
+  --w1-line: #d9ddff;
+  --w2: #14a39a;        /* teal dịu – Tuần 2 */
+  --w2-soft: #e8f7f5;
+  --w2-line: #c7ece7;
+  --warn: #d99a2b;
+  --warn-soft: #fdf6e9;
+  --warn-line: #f3e1bd;
+  --ok: #2f9e6e;
+  --ok-soft: #eaf7f0;
+  --code-bg: #22272e;
 }
 
 .slidev-layout {
   font-size: 0.9rem;
   color: var(--ink);
-  background: #fbfcfe;
-  padding: 2rem 3rem 2.6rem !important;
+  background: var(--bg);
+  padding: 1.7rem 2.8rem 2.4rem !important;
 }
 
 .slidev-layout h1 {
-  font-size: 1.65rem !important;
+  font-size: 1.55rem !important;
   font-weight: 700;
-  color: var(--navy);
+  color: var(--head);
+  letter-spacing: -0.01em;
   line-height: 1.25;
-  margin-bottom: 0.9rem !important;
+  margin-bottom: 0.75rem !important;
 }
 .slidev-layout h1 + p { opacity: 1 !important; }
 
 .slidev-layout h3 {
-  font-size: 0.95rem !important;
+  font-size: 0.9rem !important;
   font-weight: 700;
-  color: var(--navy);
-  margin: 0 0 0.35rem !important;
+  color: var(--head);
+  margin: 0 0 0.3rem !important;
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
+.slidev-layout h3 svg { color: var(--w1); }
+.slidev-layout:has(.eyebrow.t2) h3 svg { color: var(--w2); }
 
-.slidev-layout p { margin: 0.3rem 0 !important; line-height: 1.5; }
-.slidev-layout ul { margin: 0.2rem 0 !important; padding-left: 1.1rem; }
-.slidev-layout li { line-height: 1.5 !important; margin: 0.12rem 0 !important; }
+.slidev-layout p { margin: 0.25rem 0 !important; line-height: 1.5; }
+.slidev-layout ul, .slidev-layout ol { margin: 0.15rem 0 !important; padding-left: 1.1rem; }
+.slidev-layout li { line-height: 1.45 !important; margin: 0.1rem 0 !important; }
 .slidev-layout li::marker { color: var(--w1); }
-.slidev-layout strong { color: var(--navy); }
+.slidev-layout:has(.eyebrow.t2) li::marker { color: var(--w2); }
+.slidev-layout strong, .slidev-layout b { color: var(--head); }
 
-/* eyebrow tag above titles */
+/* ============ Nhãn chủ đề ============ */
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--w1);
   background: var(--w1-soft);
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--w1-line);
   border-radius: 999px;
-  padding: 0.15rem 0.7rem;
-  margin-bottom: 0.4rem;
+  padding: 0.14rem 0.7rem;
+  margin-bottom: 0.35rem;
   white-space: nowrap;
   width: fit-content;
 }
-.eyebrow.t2 { color: var(--w2); background: var(--w2-soft); border-color: #99f6e4; }
+.eyebrow.t2 { color: var(--w2); background: var(--w2-soft); border-color: var(--w2-line); }
 
-/* cards */
+/* ============ Thẻ ============ */
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 0.8rem 1rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  border-radius: 14px;
+  padding: 0.65rem 0.9rem;
+  box-shadow: 0 1px 2px rgba(35, 42, 61, 0.04), 0 4px 14px rgba(35, 42, 61, 0.04);
 }
-.card.accent { border-top: 3px solid var(--w1); }
-.card.accent2 { border-top: 3px solid var(--w2); }
-.card.soft { background: var(--w1-soft); border-color: #dbeafe; }
-.card.soft2 { background: var(--w2-soft); border-color: #ccfbf1; }
-.card.warn { background: #fffbeb; border-color: #fde68a; }
+.card.accent { border-left: 3px solid var(--w1); }
+.card.accent2 { border-left: 3px solid var(--w2); }
+.card.soft { background: var(--w1-soft); border-color: var(--w1-line); box-shadow: none; }
+.card.soft2 { background: var(--w2-soft); border-color: var(--w2-line); box-shadow: none; }
+.card.warn { background: var(--warn-soft); border-color: var(--warn-line); box-shadow: none; }
 
-.small { font-size: 0.78rem; }
-.xs { font-size: 0.7rem; }
+/* Ô ví dụ trình bày */
+.tip {
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
+  border-left: 3px solid var(--warn);
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+.tip .tip-title { font-weight: 700; color: #9a6714; margin-bottom: 0.1rem; }
+.tip b { color: #7c5410; }
+
+.small { font-size: 0.76rem; }
+.xs { font-size: 0.68rem; }
 .muted { color: var(--muted); }
 
-/* outcome bar */
+/* ============ Thanh đầu ra ============ */
 .outcome {
-  margin-top: 0.7rem;
+  margin-top: 0.55rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.9rem;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #dcfce7, #f0fdf4);
+  gap: 0.55rem;
+  padding: 0.42rem 0.9rem;
+  border-radius: 12px;
+  background: var(--ok-soft);
+  border: 1px solid #cdebdc;
   border-left: 4px solid var(--ok);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
-.outcome b { color: #166534; }
+.outcome b { color: #22734f; }
 
-/* code */
+/* ============ Code ============ */
 .slidev-layout pre, .slidev-code {
-  font-size: 0.68rem !important;
+  font-size: 0.64rem !important;
   line-height: 1.5 !important;
-  border-radius: 10px !important;
-  padding: 0.6rem 0.8rem !important;
-  margin: 0.3rem 0 !important;
+  border-radius: 12px !important;
+  padding: 0.55rem 0.8rem !important;
+  margin: 0.25rem 0 !important;
+  background: var(--code-bg) !important;
 }
-.slidev-code-wrapper { margin: 0.3rem 0 !important; }
+.slidev-code-wrapper { margin: 0.25rem 0 !important; }
 .slidev-layout :not(pre) > code {
-  font-size: 0.85em;
-  background: #f1f5f9;
-  color: #0f172a;
-  padding: 0.05rem 0.3rem;
-  border-radius: 4px;
+  font-size: 0.86em;
+  background: #eceef5;
+  color: #3a4160;
+  padding: 0.04rem 0.3rem;
+  border-radius: 5px;
 }
 
-/* tables */
-.slidev-layout table { font-size: 0.78rem; width: 100%; border-collapse: collapse; margin: 0.2rem 0; }
+/* ============ Bảng ============ */
+.slidev-layout table {
+  font-size: 0.74rem;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0.2rem 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
 .slidev-layout th {
-  background: var(--navy);
-  color: #fff;
-  font-weight: 600;
-  padding: 0.35rem 0.6rem !important;
+  background: var(--w1-soft);
+  color: #3f4bc4;
+  font-weight: 700;
+  padding: 0.32rem 0.6rem !important;
   text-align: left;
+  border-bottom: 1px solid var(--w1-line) !important;
 }
-.slidev-layout td { padding: 0.3rem 0.6rem !important; border-bottom: 1px solid var(--line); }
-.slidev-layout tr:nth-child(even) td { background: #f8fafc; }
-.slidev-layout th:first-child { border-top-left-radius: 8px; }
-.slidev-layout th:last-child { border-top-right-radius: 8px; }
+.slidev-layout:has(.eyebrow.t2) th {
+  background: var(--w2-soft);
+  color: #0f7c75;
+  border-bottom-color: var(--w2-line) !important;
+}
+.slidev-layout td { padding: 0.27rem 0.6rem !important; border-bottom: 1px solid #eef0f5; }
+.slidev-layout tr:last-child td { border-bottom: none; }
+.slidev-layout tr:nth-child(even) td { background: #fafbfd; }
 
-/* cover & section */
+/* ============ Bìa, chia phần, kết ============ */
 .slidev-layout.cover-dark,
 .slidev-layout.sec-w1,
 .slidev-layout.sec-w2 {
-  color: #fff;
+  color: #e8eaf3;
   padding: 3rem 4rem !important;
 }
 .slidev-layout.cover-dark {
   background:
-    radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.35), transparent 40%),
-    radial-gradient(circle at 10% 90%, rgba(45, 212, 191, 0.25), transparent 45%),
-    linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    radial-gradient(circle at 82% 18%, rgba(124, 138, 255, 0.28), transparent 42%),
+    radial-gradient(circle at 12% 92%, rgba(52, 190, 178, 0.18), transparent 45%),
+    linear-gradient(140deg, #1e2340 0%, #2c3566 100%);
 }
-.slidev-layout.sec-w1 { background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%); }
-.slidev-layout.sec-w2 { background: linear-gradient(135deg, #0f172a 0%, #0f766e 100%); }
+.slidev-layout.sec-w1 {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(124, 138, 255, 0.3), transparent 45%),
+    linear-gradient(140deg, #1e2340 0%, #2f3a73 100%);
+}
+.slidev-layout.sec-w2 {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(52, 190, 178, 0.28), transparent 45%),
+    linear-gradient(140deg, #18273a 0%, #173a3d 100%);
+}
 .slidev-layout.cover-dark h1,
 .slidev-layout.sec-w1 h1,
-.slidev-layout.sec-w2 h1 { color: #fff; font-size: 2.6rem !important; font-weight: 800; }
-.slidev-layout.cover-dark strong,
-.slidev-layout.sec-w1 strong,
-.slidev-layout.sec-w2 strong { color: #fff; }
+.slidev-layout.sec-w2 h1 { color: #ffffff; font-size: 2.5rem !important; font-weight: 800; letter-spacing: -0.02em; }
+.slidev-layout.cover-dark strong, .slidev-layout.cover-dark b,
+.slidev-layout.sec-w1 strong, .slidev-layout.sec-w1 b,
+.slidev-layout.sec-w2 strong, .slidev-layout.sec-w2 b { color: #fff; }
 
 .pill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.25rem 0.8rem;
   margin: 0.2rem 0.3rem 0.2rem 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.78rem;
+  color: #e8eaf3;
 }
 
 .stat { text-align: center; }
-.stat .num { font-size: 1.9rem; font-weight: 800; color: var(--w1); line-height: 1.1; }
-.stat .lbl { font-size: 0.72rem; color: var(--muted); }
+.stat .num { font-size: 1.8rem; font-weight: 800; color: var(--w1); line-height: 1.1; }
+.stat .lbl { font-size: 0.7rem; color: var(--muted); }
 
 .step {
   display: inline-flex; align-items: center; justify-content: center;
   width: 1.3rem; height: 1.3rem; border-radius: 999px;
-  background: var(--w1); color: #fff; font-size: 0.7rem; font-weight: 700;
-  margin-right: 0.4rem; flex-shrink: 0;
+  background: var(--w1); color: #fff; font-size: 0.68rem; font-weight: 700;
+  margin-right: 0.45rem; flex-shrink: 0;
 }
 .step.t2 { background: var(--w2); }
+
+.chip {
+  display: inline-block;
+  font-size: 0.66rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 6px;
+  background: var(--w1-soft);
+  color: #3f4bc4;
+  margin: 0.1rem 0.15rem 0.1rem 0;
+}
 
 .mermaid { display: flex; justify-content: center; }
 
