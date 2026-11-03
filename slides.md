@@ -34,49 +34,6 @@ class: cover-dark
 </div>
 
 ---
-
-# Tiến độ 2 tuần đầu
-
-<div class="grid grid-cols-4 gap-3 mb-4">
-  <div class="card stat"><div class="num">2</div><div class="lbl">tuần đã hoàn thành</div></div>
-  <div class="card stat"><div class="num">7</div><div class="lbl">mảng kiến thức</div></div>
-  <div class="card stat"><div class="num">6</div><div class="lbl">mảng hạ tầng nền tảng</div></div>
-  <div class="card stat"><div class="num" style="color:var(--w2)">1</div><div class="lbl">mảng Container</div></div>
-</div>
-
-<div class="grid grid-cols-2 gap-4">
-<div class="card accent">
-
-### <carbon-calendar /> Tuần 1 – Linux, Virtualization và hạ tầng nền tảng
-
-<div class="small">
-
-1. Linux doanh nghiệp: CPU, RAM, disk, process
-2. Network: IP, routing, DNS, kết nối VM
-3. Storage: partition, LVM, filesystem, mount
-4. User, group và permission
-5. Service (systemd) và firewall
-6. Hypervisor và vòng đời VM
-
-</div>
-</div>
-<div class="card accent2">
-
-### <carbon-calendar /> Tuần 2 – Container
-
-<div class="small">
-
-7. Container: kiến trúc, image & registry, Dockerfile, network, storage, Compose
-
-</div>
-
-<div class="card soft2 mt-3 small">
-<b>Mạch kiến thức:</b> hiểu máy chủ Linux → ảo hóa thành nhiều VM → đóng gói ứng dụng thành container để chạy nhẹ và nhất quán trên mọi môi trường.
-</div>
-</div>
-</div>
-
----
 layout: section
 class: sec-w1
 ---
@@ -1649,29 +1606,6 @@ loginctl enable-linger $USER    # chạy cả khi user không đăng nhập
 </div>
 
 <div class="outcome">🎯 <span><b>Đầu ra:</b> Dựng được ứng dụng nhiều service bằng Compose và chạy container bằng systemd (Quadlet)</span></div>
-
----
-
-# Kết quả đạt được sau 2 tuần
-
-| # | Mảng kiến thức | Đầu ra theo lộ trình | Trạng thái |
-|:-:|---|---|:-:|
-| 1 | Linux: CPU, RAM, disk, process | Kiểm tra và phân bổ được tài nguyên; giải thích được cho người khác | ✅ |
-| 2 | Network: IP, routing, DNS, kết nối VM | Vẽ và giải thích được luồng kết nối mạng giữa các VM trong Lab | ✅ |
-| 3 | Storage: partition, LVM, filesystem, mount | Tự thêm được disk mới, tạo LVM và mount vào hệ thống | ✅ |
-| 4 | User, group và permission | Tạo và phân quyền được theo đúng yêu cầu của ứng dụng | ✅ |
-| 5 | Service (systemd) và firewall | Quản lý được vòng đời dịch vụ; mở/đóng port theo yêu cầu | ✅ |
-| 6 | Hypervisor và vòng đời VM | Thao tác đầy đủ vòng đời VM trên hypervisor đang dùng | ✅ |
-| 7 | Container: kiến trúc, image, Dockerfile, network, storage, Compose | Viết Dockerfile, chạy và kết nối nhiều container bằng Compose; giải thích được khác biệt với VM | ✅ |
-
-<div class="grid grid-cols-2 gap-4 mt-3">
-<div class="card soft small">
-<b>Điểm mạnh:</b> ……………………………………………
-</div>
-<div class="card warn small">
-<b>Cần củng cố thêm:</b> ……………………………………………
-</div>
-</div>
 
 ---
 layout: end
