@@ -118,13 +118,6 @@ vmstat 1    # si/so > 0 liên tục = đang swap → thiếu RAM
 </div>
 </div>
 <div class="flex flex-col gap-2">
-<div class="card accent small">
-
-### <carbon-vmdk-disk /> Disk: hai câu hỏi khác nhau
-
-**Còn bao nhiêu chỗ?** (capacity) và **disk có đang nghẽn không?** (I/O)
-
-</div>
 
 ```bash
 df -hT ; df -i          # hết inode cũng "đầy disk"
@@ -172,15 +165,11 @@ sudo systemctl set-property nginx.service \
 </div>
 </div>
 
-<div class="grid grid-cols-2 gap-4 mt-2">
+<div class="mt-2">
 <div class="card soft small">
 
 <b>USE Method:</b> với mỗi tài nguyên, kiểm tra **U**tilization (mức dùng), **S**aturation (hàng đợi) và **E**rrors (lỗi). Quy trình 60 giây: `uptime` → `dmesg -T | tail` → `vmstat` → `mpstat` → `pidstat` → `iostat` → `free` → `sar -n DEV`
 
-</div>
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: server như một nhà hàng</div>
-<b>CPU</b> là đầu bếp, <b>load</b> là số món đang chờ nấu: 4 đầu bếp mà 8 món chờ là quá tải gấp đôi. <b>RAM</b> là mặt bàn bếp, <b>cache</b> là nguyên liệu bày sẵn, dọn đi được ngay. <b>%wa</b> cao là đầu bếp đứng chờ người lấy đồ trong kho (disk).
 </div>
 </div>
 
@@ -322,10 +311,6 @@ flowchart LR
 
 </div>
 
-<div class="tip mt-2">
-<div class="tip-title">💡 Ví dụ trình bày: mạng như hệ thống bưu điện</div>
-<b>IP</b> là địa chỉ nhà, <b>subnet /24</b> là cùng một con phố nên gửi thư thì đưa tận tay (switch/ARP). <b>Gateway</b> là bưu cục đầu phố, <b>routing table</b> là bảng chỉ đường chọn tuyến cụ thể nhất. <b>DNS</b> là danh bạ, tra tên "vm-db" ra 192.168.56.20 trước khi gửi.
-</div>
 </div>
 </div>
 
@@ -392,11 +377,6 @@ lvcreate -s -n snap_app -L 1G /dev/vg_data/lv_app
 echo 'UUID=<uuid> /data/app xfs defaults,nofail 0 0' >> /etc/fstab
 mount -a && findmnt --verify     # LUÔN kiểm tra trước reboot
 ```
-
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: storage như kho hàng</div>
-<b>Disk</b> là mảnh đất, <b>partition</b> là chia lô, <b>LVM</b> gộp nhiều lô thành một khu (VG) rồi chia lại linh hoạt thành các kho (LV). <b>Filesystem</b> là cách xếp kệ, <b>mount</b> là gắn biển địa chỉ "/data/app". Sắp đầy thì thêm disk, chạy vgextend + lvextend -r, không downtime.
-</div>
 
 </div>
 <div class="flex flex-col gap-2">
@@ -516,11 +496,6 @@ sudo -l -U luc        # xem user được phép chạy gì
 </div>
 </div>
 
-<div class="tip mt-2">
-<div class="tip-title">💡 Ví dụ trình bày: phân quyền như thẻ ra vào toà nhà</div>
-<b>User</b> là nhân viên, <b>group</b> là phòng ban, <b>rwx</b> là được xem, sửa, đi vào. Chỉ user <code>myapp</code> đọc được file mật khẩu DB (600), dev chỉ đọc log, deploy ghi code qua ACL. <b>sudo giới hạn</b> là thẻ chỉ mở đúng phòng cần thiết, không phải chìa khoá vạn năng.
-</div>
-
 ---
 
 # systemd và vòng đời dịch vụ
@@ -611,7 +586,7 @@ ufw enable ; ufw status numbered ; ufw delete 3
 </div>
 </div>
 
-<div class="grid grid-cols-2 gap-4 mt-2">
+<div class="mt-2">
 <div class="card accent small">
 
 ### <carbon-checkmark-outline /> Kiểm tra port end-to-end
@@ -620,10 +595,6 @@ ufw enable ; ufw status numbered ; ufw delete 3
 - Dịch vụ chỉ listen **127.0.0.1** thì máy khác không vào được dù firewall đã mở. Phải sửa `bind-address`
 - RHEL dùng port lạ thì cần mở cả SELinux: `semanage port -a -t http_port_t -p tcp 8081`
 
-</div>
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: systemd là quản lý ca, firewall là bảo vệ cổng</div>
-systemd cho dịch vụ vào ca khi boot (<b>enable</b>), tự gọi lại khi dịch vụ "ngã" (<b>Restart=on-failure</b>) và ghi sổ nhật ký (<b>journalctl</b>). Firewall mặc định đóng mọi cửa, chỉ mở 80/443 cho khách. Cửa 3306 của DB chỉ mở cho đúng vm-web, nhờ vậy bề mặt tấn công nhỏ nhất.
 </div>
 </div>
 
@@ -746,10 +717,6 @@ qemu-img convert -O qcow2 -c vm-web.qcow2 /backup/vm-web.qcow2
 <div class="card accent small"><b>Quy tắc 3-2-1:</b> 3 bản dữ liệu, trên 2 loại phương tiện, 1 bản ở ngoài site.</div>
 <div class="card accent small"><b>Application-consistent:</b> với DB, dùng qemu-guest-agent (<code>virsh domfsfreeze</code>) hoặc dump DB trước khi snapshot để tránh dữ liệu ghi dở.</div>
 <div class="card accent small"><b>RPO / RTO:</b> mất tối đa bao nhiêu dữ liệu / khôi phục trong bao lâu. Backup chưa từng restore thử thì coi như chưa có backup.</div>
-<div class="tip">
-<div class="tip-title">💡 Ví dụ: hypervisor như toà chung cư</div>
-Hypervisor là ban quản lý chia căn hộ (VM). <b>Snapshot</b> là chụp ảnh căn hộ trước khi sửa, nhưng ảnh vẫn nằm trong toà nhà. <b>Backup</b> là bản sao cất ở toà nhà khác, cháy toà nhà vẫn khôi phục được.
-</div>
 </div>
 </div>
 
@@ -872,11 +839,6 @@ flowchart LR
 </div>
 </div>
 
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: VM là nhà riêng, container là căn hộ</div>
-<b>VM</b> là nhà riêng, có móng riêng (kernel riêng). <b>Container</b> là căn hộ chung một móng (kernel host) nhưng có cửa khóa riêng (<b>namespace</b>) và công tơ điện nước riêng (<b>cgroups</b>). Nhẹ hơn và dọn vào nhanh hơn.
-</div>
-
 ---
 class: t2s
 ---
@@ -912,11 +874,6 @@ docker image history nginx        # từng layer và lệnh tạo ra nó
 docker image inspect nginx -f '{{.RepoDigests}}'
 docker buildx imagetools inspect nginx   # các nền tảng multi-arch
 ```
-
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: image là khuôn, container là bánh</div>
-Một khuôn đúc được nhiều bánh, và sửa một chiếc bánh không làm đổi khuôn. <b>Tag</b> là nhãn "khuôn mới nhất", có thể dán sang khuôn khác. <b>Digest</b> là số seri khắc trên khuôn, không đổi được.
-</div>
 
 </div>
 </div>
@@ -1116,11 +1073,6 @@ docker run -it --entrypoint sh img    # ghi đè ENTRYPOINT để debug
 </div>
 </div>
 
-<div class="tip mt-2">
-<div class="tip-title">💡 Ví dụ trình bày: ENTRYPOINT là nghề, CMD là món mặc định</div>
-Container là một đầu bếp. <b>ENTRYPOINT</b> là nghề của đầu bếp (nấu phở), <b>CMD</b> là món mặc định (phở bò). Khách gọi món khác thì chỉ đổi CMD (phở gà), không đổi nghề.
-</div>
-
 ---
 class: t2s
 ---
@@ -1275,11 +1227,6 @@ docker port my-nginx                       # xem các port đã publish
 Container ở 2 bridge khác nhau chỉ nói chuyện được qua port đã publish. Khoảng 1000 container trên một bridge có thể không ổn định. Một container gắn được nhiều network, chọn gateway bằng <code>gw-priority</code>. Docker <b>không</b> tạo rule firewall cho ipvlan, macvlan, host.
 </div>
 
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: user-defined bridge là mạng văn phòng</div>
-Mỗi ứng dụng một văn phòng riêng, có tổng đài gọi nhau theo <b>tên</b> (DNS). <b>Default bridge</b> là sảnh chung, ai cũng ngồi chung và phải nhớ số máy lẻ (IP).
-</div>
-
 </div>
 </div>
 
@@ -1378,11 +1325,6 @@ docker volume rm pgdata ; docker volume prune
 
 <div class="card soft2 xs">
 <b>Anonymous volume</b> có tên ngẫu nhiên, vẫn còn sau khi xóa container (trừ khi chạy với <code>--rm</code>) và không tự được dùng lại. Volume <b>không bao giờ tự bị xóa</b>.
-</div>
-
-<div class="tip">
-<div class="tip-title">💡 Ví dụ trình bày: lưu dữ liệu như đồ dùng văn phòng</div>
-<b>Writable layer</b> là bảng nháp, bị xóa khi tan ca. <b>Volume</b> là ổ cứng gắn ngoài, đổi máy vẫn còn. <b>Bind mount</b> là cửa thông thẳng sang kho của host. <b>tmpfs</b> là giấy note trên bàn.
 </div>
 
 </div>
@@ -1526,11 +1468,6 @@ docker compose watch           # đồng bộ code khi dev
 - Gọi nhau bằng **tên service** và **port trong container** (`db:5432`), không dùng port host
 - IP đổi khi container được tạo lại, nên luôn dùng tên. `network_mode: host` làm mất DNS theo tên service
 
-</div>
-
-<div class="tip">
-<div class="tip-title">💡 Compose là bản phối cho cả dàn nhạc</div>
-Một file mô tả từng nhạc công (<b>service</b>), sân khấu (<b>network</b>) và nhạc cụ riêng (<b>volume</b>). <code>up</code> là ra hiệu bắt đầu, <code>down</code> là thu dọn.
 </div>
 
 </div>
