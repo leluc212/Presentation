@@ -1,7 +1,7 @@
 ---
 theme: default
 title: Báo cáo tiến độ học tập – Tuần 1 & 2
-info: Tóm tắt kiến thức Linux, Virtualization, Container và Kubernetes
+info: Tóm tắt kiến thức Linux, Virtualization và Container
 transition: slide-left
 mdc: true
 colorSchema: light
@@ -16,7 +16,7 @@ class: cover-dark
 
 <div class="text-sm tracking-widest uppercase opacity-70 mb-3">Báo cáo tiến độ học tập</div>
 
-# Linux, Virtualization<br/>→ Container & Kubernetes
+# Linux, Virtualization<br/>→ Container
 
 <div class="text-lg opacity-85 mt-2 mb-6">Tổng kết kiến thức Tuần 1 và Tuần 2</div>
 
@@ -27,7 +27,6 @@ class: cover-dark
 <span class="pill"><carbon-security /> Permission</span>
 <span class="pill"><carbon-virtual-machine /> Hypervisor</span>
 <span class="pill"><logos-docker-icon /> Container</span>
-<span class="pill"><logos-kubernetes /> Kubernetes</span>
 </div>
 
 <div class="mt-10 text-sm opacity-80">Người báo cáo: <b>Lê Tấn Lực</b> · <b>Đỗ Hoàng Hiếu</b></div>
@@ -42,9 +41,9 @@ class: cover-dark
 
 <div class="grid grid-cols-4 gap-3 mb-4">
   <div class="card stat"><div class="num">2</div><div class="lbl">tuần đã hoàn thành</div></div>
-  <div class="card stat"><div class="num">8</div><div class="lbl">mảng kiến thức</div></div>
+  <div class="card stat"><div class="num">7</div><div class="lbl">mảng kiến thức</div></div>
   <div class="card stat"><div class="num">6</div><div class="lbl">mảng hạ tầng nền tảng</div></div>
-  <div class="card stat"><div class="num" style="color:var(--w2)">2</div><div class="lbl">mảng Container & K8s</div></div>
+  <div class="card stat"><div class="num" style="color:var(--w2)">1</div><div class="lbl">mảng Container</div></div>
 </div>
 
 <div class="grid grid-cols-2 gap-4">
@@ -65,17 +64,16 @@ class: cover-dark
 </div>
 <div class="card accent2">
 
-### <carbon-calendar /> Tuần 2 – Container và Kubernetes Foundation
+### <carbon-calendar /> Tuần 2 – Container
 
 <div class="small">
 
 7. Container: image, registry, volume, network, resource limit
-8. Kiến trúc Kubernetes và vai trò từng thành phần
 
 </div>
 
 <div class="card soft2 mt-3 small">
-<b>Mạch kiến thức:</b> hiểu máy chủ Linux → ảo hóa thành nhiều VM → đóng gói ứng dụng thành container → điều phối container ở quy mô cluster bằng Kubernetes.
+<b>Mạch kiến thức:</b> hiểu máy chủ Linux → ảo hóa thành nhiều VM → đóng gói ứng dụng thành container để chạy nhẹ và nhất quán trên mọi môi trường.
 </div>
 </div>
 </div>
@@ -893,14 +891,13 @@ class: sec-w2
 
 <div class="text-sm tracking-widest uppercase opacity-70 mb-2">Tuần 2</div>
 
-# Container và<br/>Kubernetes Foundation
+# Container
 
 <div class="mt-6">
 <span class="pill"><logos-docker-icon /> Image & Registry</span>
 <span class="pill">Volume</span>
 <span class="pill">Network</span>
 <span class="pill">Resource limit</span>
-<span class="pill"><logos-kubernetes /> Kiến trúc Kubernetes</span>
 </div>
 
 ---
@@ -1051,124 +1048,6 @@ docker stats                     # theo dõi CPU/RAM thực tế của từng co
 
 ---
 
-<div class="eyebrow t2"><logos-kubernetes /> Tuần 2 · Chủ đề 8</div>
-
-# Kiến trúc Kubernetes
-
-```mermaid {scale: 0.56}
-flowchart LR
-  U[kubectl / CI-CD] --> API
-  subgraph CP[Control Plane]
-    API[kube-apiserver]
-    ETCD[(etcd)]
-    SCH[kube-scheduler]
-    CM[kube-controller-manager]
-    API <--> ETCD
-    SCH <--> API
-    CM <--> API
-  end
-  subgraph W1[Worker Node 1]
-    KL1[kubelet] --> CR1[containerd]
-    CR1 --> P1[Pod] & P2[Pod]
-    KP1[kube-proxy]
-  end
-  subgraph W2[Worker Node 2]
-    KL2[kubelet] --> CR2[containerd]
-    CR2 --> P3[Pod]
-    KP2[kube-proxy]
-  end
-  API <--> KL1 & KL2
-  API <--> KP1 & KP2
-```
-
-<div class="grid grid-cols-2 gap-3 mt-1">
-<div class="card soft2 small">
-<b>Control Plane</b> là "bộ não": nhận yêu cầu, lưu trạng thái mong muốn, quyết định Pod chạy ở đâu và liên tục sửa lệch.
-</div>
-<div class="card soft2 small">
-<b>Worker Node</b> là nơi chạy workload: nhận lệnh từ apiserver, chạy container và cấu hình mạng cho Service.
-</div>
-</div>
-
----
-
-<div class="eyebrow t2"><logos-kubernetes /> Tuần 2 · Chủ đề 8</div>
-
-# Vai trò từng thành phần
-
-<div class="grid grid-cols-2 gap-4">
-<div>
-
-| Control Plane | Vai trò |
-|---|---|
-| **kube-apiserver** | Cổng duy nhất vào cluster. Xác thực, phân quyền, ghi/đọc etcd. Mọi thành phần khác giao tiếp qua đây |
-| **etcd** | CSDL key-value lưu toàn bộ trạng thái cluster. Mất etcd là mất cluster, nên phải backup |
-| **kube-scheduler** | Chọn node cho Pod mới dựa trên tài nguyên còn trống, affinity, taint/toleration |
-| **controller-manager** | Chạy các controller (Deployment, ReplicaSet, Node…), so sánh trạng thái thực với mong muốn rồi sửa |
-
-</div>
-<div>
-
-| Worker Node | Vai trò |
-|---|---|
-| **kubelet** | Agent trên mỗi node. Nhận Pod được giao, gọi runtime chạy container, báo cáo trạng thái và health check |
-| **container runtime** | Chạy container thật qua chuẩn CRI: containerd, CRI-O |
-| **kube-proxy** | Cấu hình iptables/IPVS để traffic tới **Service** được chia đều về các Pod |
-| **CNI plugin** | Cấp IP cho Pod, cho Pod ở các node khác nhau nói chuyện được: Calico, Flannel, Cilium |
-
-</div>
-</div>
-
-<div class="card soft2 small mt-3">
-
-<b>Đối tượng cơ bản:</b> **Pod** (đơn vị nhỏ nhất, 1+ container) · **Deployment** (quản lý số bản sao, rolling update) · **Service** (IP/DNS ổn định trước nhóm Pod) · **Namespace** (chia cluster theo team/môi trường) · **ConfigMap / Secret** (cấu hình và thông tin nhạy cảm)
-
-</div>
-
----
-
-<div class="eyebrow t2"><logos-kubernetes /> Tuần 2 · Chủ đề 8</div>
-
-# Luồng xử lý khi triển khai một ứng dụng
-
-<div class="grid grid-cols-5 gap-4">
-<div class="col-span-3 flex flex-col gap-1.5 small">
-  <div class="card flex items-center" style="padding:0.4rem 0.8rem"><span class="step t2">1</span><span><b>kubectl apply</b> gửi Deployment (replicas: 3) tới <b>kube-apiserver</b>; apiserver xác thực rồi lưu vào <b>etcd</b></span></div>
-  <div class="card flex items-center" style="padding:0.4rem 0.8rem"><span class="step t2">2</span><span><b>Deployment controller</b> thấy Deployment mới → tạo ReplicaSet → ReplicaSet tạo <b>3 Pod</b> (chưa có node)</span></div>
-  <div class="card flex items-center" style="padding:0.4rem 0.8rem"><span class="step t2">3</span><span><b>kube-scheduler</b> thấy Pod chưa có node → chọn node phù hợp và ghi lại qua apiserver</span></div>
-  <div class="card flex items-center" style="padding:0.4rem 0.8rem"><span class="step t2">4</span><span><b>kubelet</b> trên node đó thấy Pod được giao → gọi <b>containerd</b> pull image và chạy container</span></div>
-  <div class="card flex items-center" style="padding:0.4rem 0.8rem"><span class="step t2">5</span><span>kubelet báo trạng thái <b>Running</b> về apiserver; <b>kube-proxy</b> cập nhật routing nếu có Service trỏ tới Pod</span></div>
-  <div class="card soft2 xs" style="padding:0.4rem 0.8rem"><b>Cơ chế cốt lõi:</b> khai báo trạng thái mong muốn, hệ thống tự điều chỉnh. Pod chết thì controller tạo Pod mới thay thế.</div>
-</div>
-<div class="col-span-2 flex flex-col gap-2">
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata: { name: webapp }
-spec:
-  replicas: 3
-  selector:
-    matchLabels: { app: webapp }
-  template:
-    metadata:
-      labels: { app: webapp }
-    spec:
-      containers:
-      - name: web
-        image: team/webapp:1.4.2
-        resources:
-          limits: { cpu: 500m, memory: 512Mi }
-```
-
-
-</div>
-</div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Vẽ lại được kiến trúc Kubernetes không nhìn tài liệu</span></div>
-
----
-
 <div class="eyebrow"><carbon-task-complete /> Tổng kết</div>
 
 # Kết quả đạt được sau 2 tuần
@@ -1182,7 +1061,6 @@ spec:
 | 5 | Service (systemd) và firewall | Quản lý được vòng đời dịch vụ; mở/đóng port theo yêu cầu | ✅ |
 | 6 | Hypervisor và vòng đời VM | Thao tác đầy đủ vòng đời VM trên hypervisor đang dùng | ✅ |
 | 7 | Container | Giải thích được cơ chế container và khác biệt so với VM trong 5 phút | ✅ |
-| 8 | Kiến trúc Kubernetes | Vẽ lại được kiến trúc Kubernetes không nhìn tài liệu | ✅ |
 
 <div class="grid grid-cols-2 gap-4 mt-3">
 <div class="card soft small">

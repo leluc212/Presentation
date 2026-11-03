@@ -7,7 +7,7 @@
       <div class="lpc-progress-bar" :style="{ width: (($nav.currentPage / $nav.total) * 100) + '%' }" />
     </div>
     <div class="lpc-footer-row">
-      <span>Báo cáo tiến độ · Tuần 1 &amp; 2 · Linux → Kubernetes</span>
+      <span>Báo cáo tiến độ · Tuần 1 &amp; 2 · Linux → Container</span>
       <span>{{ $nav.currentPage }} / {{ $nav.total }}</span>
     </div>
   </footer>
