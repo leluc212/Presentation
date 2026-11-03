@@ -66,7 +66,7 @@ class: cover-dark
 
 <div class="small">
 
-7. Container: image, registry, volume, network, resource limit
+7. Container: kiến trúc, image & registry, Dockerfile, network, storage, Compose
 
 </div>
 
@@ -855,15 +855,19 @@ class: sec-w2
 # Container
 
 <div class="mt-6">
-<span class="pill"><logos-docker-icon /> Image & Registry</span>
-<span class="pill">Volume</span>
+<span class="pill"><logos-docker-icon /> Kiến trúc</span>
+<span class="pill">Image & Registry</span>
+<span class="pill">Dockerfile</span>
 <span class="pill">Network</span>
-<span class="pill">Resource limit</span>
+<span class="pill">Storage</span>
+<span class="pill">Compose</span>
 </div>
 
 ---
+class: t2s
+---
 
-# Container hoạt động như thế nào?
+# Container là gì? So sánh với VM
 
 <div class="grid grid-cols-2 gap-4">
 <div class="flex flex-col gap-3">
@@ -871,135 +875,780 @@ class: sec-w2
 
 ### <carbon-container-software /> Container là tiến trình được cô lập
 
-Container không phải máy ảo. Đó là tiến trình chạy trên **kernel của host**, được kernel Linux cô lập bằng 3 cơ chế:
-
-- **Namespaces**: cô lập những gì tiến trình *nhìn thấy*: `pid`, `net`, `mnt`, `uts` (hostname), `ipc`, `user`
-- **cgroups**: giới hạn tài nguyên tiến trình *được dùng*: CPU, RAM, I/O
-- **Union filesystem** (overlay2): ghép các layer chỉ đọc của image với một layer ghi riêng cho container
+- Docker đóng gói và chạy ứng dụng trong một môi trường cô lập "lỏng"
+- Container dùng chung **kernel host**, VM chạy **kernel khách** riêng → mật độ workload cao hơn
+- **Namespaces** cô lập những gì tiến trình *nhìn thấy*
+- **cgroups** giới hạn tài nguyên được *dùng*. RHEL thêm **SELinux** để bảo mật
+- **Union FS**: image gồm nhiều layer chỉ đọc xếp chồng
 
 </div>
-</div>
-<div>
 
-| Tiêu chí | Virtual Machine | Container |
+| | Virtual Machine | Container |
 |---|---|---|
 | Ảo hóa | Phần cứng (hypervisor) | Hệ điều hành (kernel) |
-| Hệ điều hành | Mỗi VM một Guest OS | Dùng chung kernel host |
-| Kích thước | Vài GB | Vài chục – vài trăm MB |
-| Khởi động | Phút | Giây |
-| Mức cô lập | Mạnh | Yếu hơn |
-| Phù hợp | Nhiều OS, cô lập cao | Microservice, CI/CD |
+| Kernel | Mỗi VM một kernel | Dùng chung kernel host |
+| Kích thước · khởi động | Vài GB · phút | Vài chục MB · giây |
 
-<div class="card soft2 small mt-2">
-<b>Tóm lại:</b> VM ảo hóa cả một máy tính. Container chỉ cô lập ứng dụng, nên nhẹ và nhanh hơn nhưng phải dùng chung kernel.
+</div>
+<div class="flex flex-col gap-3">
+
+| Namespace | Cô lập |
+|---|---|
+| `PID` | ID tiến trình (container có PID 1 riêng) |
+| `Network` | Interface, IP, port, route |
+| `Mount` | Các điểm mount |
+| `UTS` | Hostname, tên miền NIS |
+| `IPC` | Hàng đợi tin nhắn, shared memory |
+| `User` | UID/GID (root trong container ≠ root host) |
+| `Cgroup` | Cây cgroup nhìn thấy |
+| `Time` | Đồng hồ boot / monotonic |
+
+<div class="card soft2 xs">
+Từ Linux 3.8, tạo <b>user namespace</b> không cần đặc quyền. Các loại khác thường cần <code>CAP_SYS_ADMIN</code>. Đây là nền tảng của chế độ <b>rootless</b>.
 </div>
 
 </div>
+</div>
+
+---
+class: t2s
+---
+
+# OCI và kiến trúc Docker
+
+```mermaid {scale: 0.5}
+flowchart LR
+  CLI[docker CLI] -->|REST API<br/>UNIX socket| D[dockerd]
+  D --> C[containerd] --> R[runc] --> CT[Container]
+  D -->|pull · push| REG[(Registry<br/>Docker Hub)]
+```
+
+<div class="grid grid-cols-2 gap-4">
+<div class="card accent2 small">
+
+### <carbon-document /> 3 đặc tả OCI
+
+- **Image Spec:** manifest, index, các layer và config
+- **Runtime Spec:** chạy một "filesystem bundle". Luồng: tải image → giải nén thành bundle → runtime chạy
+- **Distribution Spec:** API phân phối image, chuẩn hóa từ Docker Registry HTTP API V2
+- Image và Distribution bản 1.1.0 (15/02/2024). **Podman, Buildah, Skopeo** tương thích OCI
+
+</div>
+<div class="card accent2 small">
+
+### <carbon-flow /> Thành phần Docker
+
+- Mô hình **client-server**. CLI gọi daemon qua REST API
+- **dockerd** quản lý image, container, network, volume
+- **containerd** lo vòng đời container, mặc định gọi **runc**
+- **Docker Desktop** (Mac/Win/Linux, kèm Compose…) khác **Docker Engine** (`docker-ce`). Lab RHEL 9 dùng Engine
+
+</div>
+</div>
+
+<div class="tip">
+<div class="tip-title">💡 Ví dụ trình bày: VM là nhà riêng, container là căn hộ</div>
+<b>VM</b> là nhà riêng, có móng riêng (kernel riêng). <b>Container</b> là căn hộ chung một móng (kernel host) nhưng có cửa khóa riêng (<b>namespace</b>) và công tơ điện nước riêng (<b>cgroups</b>). Nhẹ hơn và dọn vào nhanh hơn.
 </div>
 
 <div class="outcome">🎯 <span><b>Đầu ra:</b> Giải thích được cơ chế container và khác biệt so với VM trong 5 phút</span></div>
 
 ---
+class: t2s
+---
 
-# Image và Registry
+# Image = layers + config + manifest
 
 <div class="grid grid-cols-2 gap-4">
 <div class="flex flex-col gap-3">
 <div class="card accent2 small">
 
-### <carbon-layers /> Image
+### <carbon-layers /> Cấu trúc image (OCI)
 
-- Template **chỉ đọc**, gồm nhiều **layer**. Mỗi lệnh trong Dockerfile tạo một layer
-- Layer được **cache và dùng chung** giữa các image → build và pull nhanh
-- Container = image + một layer ghi. Xóa container thì layer ghi mất
+- Gói chuẩn chứa file, binary, thư viện và cấu hình. Hai nguyên tắc: **bất biến** và **ghép từ layer**
+- **Manifest** trỏ tới layer bằng **digest** (định danh theo nội dung). **Config** chứa lệnh chạy, biến môi trường
+- **Multi-arch:** image index (Docker gọi là *manifest list*) trỏ tới một manifest cho mỗi nền tảng
+- Sau khi tải, image được kiểm tra bằng hash
 
 </div>
+
+| | Tag `:1.4.2`, `:latest` | Digest `@sha256:…` |
+|---|---|---|
+| Bản chất | Con trỏ, có thể bị gán lại | Bất biến theo nội dung |
+| Dùng khi | Dev, thử nghiệm | **Production**, cần tái lập |
+
+</div>
+<div class="flex flex-col gap-3">
+
+```bash
+docker pull nginx                 # không tag → :latest
+docker pull nginx@sha256:<digest> # ghim đúng một bản
+docker image ls                   # kích thước ĐÃ giải nén
+docker image history nginx        # từng layer và lệnh tạo ra nó
+docker image inspect nginx -f '{{.RepoDigests}}'
+docker buildx imagetools inspect nginx   # các nền tảng multi-arch
+```
+
+<div class="tip">
+<div class="tip-title">💡 Ví dụ trình bày: image là khuôn, container là bánh</div>
+Một khuôn đúc được nhiều bánh, và sửa một chiếc bánh không làm đổi khuôn. <b>Tag</b> là nhãn "khuôn mới nhất", có thể dán sang khuôn khác. <b>Digest</b> là số seri khắc trên khuôn, không đổi được.
+</div>
+
+</div>
+</div>
+
+---
+class: t2s
+---
+
+# Vòng đời container và các lệnh
+
+```mermaid {scale: 0.62}
+flowchart LR
+  CR([created]) -->|start| RU([running])
+  RU -->|pause| PA([paused])
+  PA -->|unpause| RU
+  RU -->|stop · kill · thoát| EX([exited])
+  EX -->|start| RU
+  RU -.->|restart policy| RS([restarting])
+  RS -.-> RU
+  EX -->|rm| RM([đã xóa])
+```
+
+<div class="grid grid-cols-2 gap-4">
+<div class="tbl-xs">
+
+| Lệnh | Chức năng |
+|---|---|
+| `run` | `create` + `start` |
+| `create` / `start` | Tạo container chưa chạy / chạy container đã tạo |
+| `stop` | Dừng có ân hạn: SIGTERM, hết hạn mới SIGKILL |
+| `kill` | Gửi SIGKILL ngay (mặc định) |
+| `rm` | Xóa container (`-f` nếu đang chạy) |
+| `exec` | Chạy lệnh trong container đang chạy |
+| `logs` · `inspect` | Xem log · chi tiết dạng JSON |
+| `ps -a` · `top` · `stats` | Danh sách (cả đã dừng) · tiến trình · tài nguyên |
+
+</div>
+<div class="flex flex-col gap-2">
+
+```bash
+docker run -d --name web -p 8080:80 \
+  --memory 512m --cpus 1 --restart unless-stopped nginx:1.27
+docker ps -a --filter status=exited
+docker exec -it web sh
+docker logs -f --tail 50 web
+docker stop web ; docker start web ; docker rm -f web
+```
+
+<div class="card soft2 xs">
+<b>Trạng thái:</b> created · running · paused · restarting · exited · dead.<br/>
+<b>Resource limit:</b> vượt <code>--memory</code> thì container bị <b>OOM kill</b>. <code>--cpus 1</code> giới hạn tối đa 1 core. Không đặt limit thì một container có thể chiếm hết tài nguyên host.
+</div>
+
+</div>
+</div>
+
+---
+class: t2s
+---
+
+# Registry và quản lý image
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-3">
 <div class="card accent2 small">
 
 ### <carbon-cloud-upload /> Registry
 
-- Nơi lưu và phân phối image: Docker Hub, Harbor, GitLab Registry, ECR…
-- Tên đầy đủ: `registry.company.vn/team/webapp:1.4.2`
-- **Không dùng tag `latest`** cho production vì không biết chính xác phiên bản đang chạy
+- Tên đầy đủ: `registry[:port]/namespace/repo:tag`. `docker pull fedora` thực chất là `docker.io/library/fedora:latest`
+- Tag có `host:port` ở đầu thì Docker push tới registry đó
+- `docker login` lưu credential ở `~/.docker/config.json` (Podman/skopeo: `$XDG_RUNTIME_DIR/containers/auth.json`)
+- Registry riêng `registry:3` chỉ để test. Production cần **TLS** và kiểm soát truy cập
+
+</div>
+
+| Docker Hub | Giới hạn pull |
+|---|---|
+| Chưa đăng nhập | 100 lượt / 6 giờ cho mỗi IPv4 (hoặc subnet IPv6 /64) |
+| Personal | 200 lượt / 6 giờ |
+| Pro / Team / Business | Không giới hạn |
+
+</div>
+<div class="flex flex-col gap-3">
+
+```bash
+docker run -d -p 5000:5000 --name registry registry:3
+docker tag webapp:1.4.2 localhost:5000/team/webapp:1.4.2
+docker push localhost:5000/team/webapp:1.4.2
+docker image prune -a   # xóa image không dùng
+docker system df        # xem dung lượng đã dùng
+docker system prune     # dọn container dừng, cache…
+```
+
+| Lệnh | Đối tượng | Giữ được gì |
+|---|---|---|
+| `save` / `load` | Image | Các layer, tag và metadata |
+| `export` / `import` | Filesystem container | Một lớp phẳng, mất lịch sử và config |
+
+<div class="card soft2 xs">
+Bị chặn <b>abuse limit</b> thì nhận lỗi 429 ngắn gọn. Hết <b>pull limit</b> thì nhận thông báo dài kèm link tài liệu. skopeo đọc được file <code>docker save</code> (định dạng docker-archive).
+</div>
 
 </div>
 </div>
-<div>
+
+<div class="outcome">🎯 <span><b>Đầu ra:</b> Pull, tag, push image lên registry; quản lý được vòng đời container và dung lượng image</span></div>
+
+---
+class: t2s
+---
+
+# Các lệnh Dockerfile
+
+<div class="grid grid-cols-5 gap-4">
+<div class="col-span-3 tbl-xs">
+
+| Lệnh | Tác dụng |
+|---|---|
+| `FROM` | Bắt đầu một stage, chọn base image. Nhiều FROM là multi-stage. Bỏ tag thì dùng `latest` |
+| `RUN` | Chạy lệnh và tạo layer mới. Cache không tự hết hạn, dùng `--no-cache` để chạy lại |
+| `COPY` / `ADD` | COPY sao chép từ context, stage hoặc image. ADD thêm tải URL/Git, tự giải nén tar, `--checksum` |
+| `WORKDIR` | Thư mục làm việc, tự tạo nếu chưa có. Dùng đường dẫn tuyệt đối thay cho `RUN cd` |
+| `ARG` / `ENV` | ARG chỉ có lúc build (`--build-arg`), ENV nằm luôn trong image |
+| `EXPOSE` | **Chỉ là tài liệu.** Muốn publish phải dùng `-p` / `-P` |
+| `USER` | User/UID mặc định cho RUN, CMD, ENTRYPOINT phía sau |
+| `VOLUME` | Mount point cho dữ liệu gắn ngoài |
+| `HEALTHCHECK` | starting → healthy / unhealthy (mặc định 30s, thử 3 lần) |
+| `LABEL` · `ONBUILD` | Metadata key-value · trigger chạy khi image được dùng làm base |
+
+</div>
+<div class="col-span-2 flex flex-col gap-2">
 
 ```dockerfile
-# Multi-stage build: image cuối nhỏ gọn
-FROM node:20-alpine AS build
+# syntax=docker/dockerfile:1
+FROM python:3.12-slim
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci          # layer được cache
+COPY requirements.txt .
+RUN pip install --no-cache-dir \
+      -r requirements.txt
 COPY . .
-RUN npm run build
+USER 10001
+EXPOSE 8000
+HEALTHCHECK CMD curl -f \
+  http://localhost:8000/health || exit 1
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "app:app"]
+```
 
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
-USER node           # không chạy bằng root
-EXPOSE 3000
-CMD ["node", "dist/server.js"]
+<div class="card warn xs">
+<b>Không dùng ARG/ENV cho bí mật:</b> giá trị hiện trong <code>docker history</code>, và unset ENV ở layer sau không xóa được.<br/>
+<b>Exec form</b> <code>["a","b"]</code> phải dùng nháy kép và không thay biến <code>$HOME</code>. <b>Shell form</b> chạy qua <code>/bin/sh -c</code>.
+</div>
+
+</div>
+</div>
+
+---
+class: t2s
+---
+
+# CMD và ENTRYPOINT
+
+<div class="tbl-xs">
+
+| | Không ENTRYPOINT | ENTRYPOINT shell: `entry p1` | ENTRYPOINT exec: `["entry","p1"]` |
+|---|---|---|---|
+| **Không CMD** | Lỗi, không cho phép | `/bin/sh -c entry p1` | `entry p1` |
+| **CMD `["cmd","p1"]`** | `cmd p1` | `/bin/sh -c entry p1` | `entry p1 cmd p1` |
+| **CMD `cmd p1`** | `/bin/sh -c cmd p1` | `/bin/sh -c entry p1` | `entry p1 /bin/sh -c cmd p1` |
+
+</div>
+
+<div class="grid grid-cols-2 gap-4 mt-3">
+<div class="card accent2 small">
+
+### <carbon-rule /> Quy tắc dùng
+
+- **ENTRYPOINT** là lệnh chính, **CMD** là tham số mặc định. `docker run image <args>` ghi đè CMD
+- ENTRYPOINT dạng shell **bỏ qua CMD** và không nhận tín hiệu, nên tránh dùng
+- Đặt ENTRYPOINT sẽ **reset CMD** kế thừa từ base image
+- CMD gần như luôn dùng exec form. Script entrypoint kết thúc bằng `exec "$@"` để app thành **PID 1** và nhận SIGTERM
+
+</div>
+<div class="flex flex-col gap-2">
+
+```bash
+# Dockerfile
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
+# docker-entrypoint.sh
+set -e
+envsubst < /tpl/app.conf > /etc/app.conf
+exec "$@"            # thay shell bằng CMD → PID 1
+# Khi chạy
+docker run img                        # entrypoint + CMD mặc định
+docker run img nginx -T               # ghi đè CMD
+docker run -it --entrypoint sh img    # ghi đè ENTRYPOINT để debug
+```
+
+</div>
+</div>
+
+<div class="tip mt-2">
+<div class="tip-title">💡 Ví dụ trình bày: ENTRYPOINT là nghề, CMD là món mặc định</div>
+Container là một đầu bếp. <b>ENTRYPOINT</b> là nghề của đầu bếp (nấu phở), <b>CMD</b> là món mặc định (phở bò). Khách gọi món khác thì chỉ đổi CMD (phở gà), không đổi nghề.
+</div>
+
+---
+class: t2s
+---
+
+# Build context, cache và multi-stage
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-3">
+<div class="card accent2 small">
+
+### <carbon-folder /> Build context và .dockerignore
+
+- Context là tập file build được truy cập: thư mục, URL Git, tarball hoặc `-`
+- COPY file ngoài context hoặc bị ignore sẽ gây lỗi `failed to compute cache key: ... "/main.c": not found`
+- `.dockerignore` đặt ở gốc context, cú pháp như `.gitignore`, giúp build nhanh hơn: `.git` `node_modules` `*.log` `.env`. Podman ưu tiên `.containerignore`
+
+</div>
+<div class="card accent2 small">
+
+### <carbon-repeat /> Quy tắc cache
+
+- Mỗi lệnh tạo 1 layer. **Một layer đổi thì mọi layer phía sau build lại**
+- ADD/COPY so checksum nội dung file (không tính mtime). RUN chỉ so chuỗi lệnh
+- Thứ tự đúng: OS packages → file dependency → cài dependency → mã nguồn
+- `--pull` lấy base image mới, `--no-cache` bỏ cache
+
+</div>
+</div>
+<div class="flex flex-col gap-2">
+
+```dockerfile
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download        # được cache nếu go.mod không đổi
+COPY . .
+RUN CGO_ENABLED=0 go build -o /out/app .
+
+FROM build AS test
+RUN go test ./...
+
+FROM gcr.io/distroless/static AS final
+COPY --from=build /out/app /app
+USER 65532
+ENTRYPOINT ["/app"]
 ```
 
 ```bash
-docker build -t registry.company.vn/team/webapp:1.4.2 .
-docker push registry.company.vn/team/webapp:1.4.2
+docker build --target test -t app:test .   # dừng ở stage test
+docker build -t app:1.0 .                  # build tới stage cuối
+```
+
+<div class="card soft2 xs">
+<b>Multi-stage:</b> mỗi FROM là một stage, chỉ chép artifact cần thiết sang stage cuối nên image nhỏ, không chứa compiler. Các stage chạy song song được và dùng lại được. Podman cũng hỗ trợ <code>--target</code>.
+</div>
+
+</div>
+</div>
+
+---
+class: t2s
+---
+
+# BuildKit, buildx và best practices
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+
+```dockerfile
+# syntax=docker/dockerfile:1
+# Cache mount: giữ cache pip giữa các lần build
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.txt
+# Secret mount: không lưu vào layer, nằm ở /run/secrets/aws
+RUN --mount=type=secret,id=aws \
+    AWS_SHARED_CREDENTIALS_FILE=/run/secrets/aws \
+    aws s3 cp s3://bucket/model.bin .
+```
+
+```bash
+docker build --secret id=aws,src=$HOME/.aws/credentials .
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t registry.company.vn/team/app:1.0 --push .
+```
+
+<div class="card soft2 xs">
+BuildKit là builder mặc định. <code>RUN --mount</code> có các kiểu bind (mặc định), cache, tmpfs, secret, ssh. Cache mount chỉ để tăng tốc và không xuất qua <code>--cache-to</code>, nên CI runner mới có cache rỗng. Multi-platform có 3 cách: QEMU, builder nhiều node native, cross-compile trong multi-stage.
+</div>
+
+</div>
+<div class="flex flex-col gap-3">
+<div class="card accent2 small">
+
+### <carbon-checkmark-outline /> Best practices
+
+1. Base image nhỏ và tin cậy (Official Images, Verified Publisher)
+2. Ghim version/digest để tái lập được. Đổi lại, image không tự nhận bản vá
+3. Rebuild thường xuyên vì image bất biến
+4. Mỗi container một mối quan tâm. Không cài gói thừa vì container là tạm thời
+5. Chạy **non-root** với UID/GID cố định. Tránh sudo (dùng gosu nếu cần)
+6. Dùng `set -o pipefail`, vì `/bin/sh -c` chỉ xét mã thoát của lệnh cuối
+
+</div>
+</div>
+</div>
+
+<div class="outcome">🎯 <span><b>Đầu ra:</b> Viết được Dockerfile multi-stage, tận dụng cache, không lộ bí mật và chạy non-root</span></div>
+
+---
+class: t2s
+---
+
+# Network drivers: default bridge và user-defined bridge
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="tbl-xs">
+
+| Driver | Đặc điểm |
+|---|---|
+| `bridge` | **Mặc định.** Mạng riêng trên host, ra ngoài qua NAT |
+| `host` | Bỏ cô lập, dùng thẳng stack mạng của host |
+| `none` | Cô lập hoàn toàn, không có mạng |
+| `overlay` | Nối nhiều host (Swarm) |
+| `macvlan` | Container có MAC riêng, trông như thiết bị vật lý |
+| `ipvlan` | Giống macvlan nhưng không cấp MAC riêng |
+
+</div>
+
+```bash
+docker network create -d bridge --subnet 172.20.0.0/24 my-net
+docker network ls ; docker network inspect my-net
+docker network connect my-net my-nginx     # gắn khi đang chạy
+docker network disconnect my-net my-nginx
+docker network rm my-net                   # phải disconnect trước
+docker port my-nginx                       # xem các port đã publish
+```
+
+</div>
+<div class="flex flex-col gap-2">
+<div class="tbl-xs">
+
+| | Default bridge (`docker0`) | User-defined bridge |
+|---|---|---|
+| Tạo | Tự động. Container không có `--network` sẽ gắn vào | `docker network create` |
+| DNS theo tên | Không | **Có** |
+| Cô lập | Mọi container chung một mạng | Tốt hơn, tách theo ứng dụng |
+| Connect / disconnect | Phải tạo lại container | Được khi đang chạy |
+| Trạng thái | Legacy | **Khuyến nghị** |
+
+</div>
+
+<div class="card soft2 xs">
+Container ở 2 bridge khác nhau chỉ nói chuyện được qua port đã publish. Khoảng 1000 container trên một bridge có thể không ổn định. Một container gắn được nhiều network, chọn gateway bằng <code>gw-priority</code>. Docker <b>không</b> tạo rule firewall cho ipvlan, macvlan, host.
+</div>
+
+<div class="tip">
+<div class="tip-title">💡 Ví dụ trình bày: user-defined bridge là mạng văn phòng</div>
+Mỗi ứng dụng một văn phòng riêng, có tổng đài gọi nhau theo <b>tên</b> (DNS). <b>Default bridge</b> là sảnh chung, ai cũng ngồi chung và phải nhớ số máy lẻ (IP).
+</div>
+
+</div>
+</div>
+
+---
+class: t2s
+---
+
+# Publish port, bảo mật và firewalld
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-3">
+<div class="card accent2 small">
+
+### <carbon-network-3 /> Publish port
+
+- `-p 8080:80` · `-p 192.168.1.100:8080:80` · `-p 8080:80/udp`. `-P` publish mọi port EXPOSE ra port ngẫu nhiên
+- Mặc định bind **mọi địa chỉ** host (IPv4 + IPv6), tức là "không an toàn mặc định". Chỉ cho host truy cập: `-p 127.0.0.1:8080:80`
+- **Docker 28:** host cùng L2 không còn truy cập được port publish vào localhost (trước 28.0.0 thì được)
+- Đổi bind mặc định: `-o com.docker.network.bridge.host_binding_ipv4=127.0.0.1` hoặc `default-network-opts` trong `daemon.json`
+
+</div>
+<div class="card accent2 small">
+
+### <carbon-search /> DNS nhúng, container gọi container
+
+- Trên user-defined network, container gọi nhau bằng **tên** hoặc IP qua DNS nhúng `127.0.0.11`
+- Trong cùng user-defined bridge, **mọi port mở cho nhau**, không cần `-p`
+
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="card warn small">
+
+### <carbon-warning-alt /> Docker và firewall
+
+- Docker xử lý trong bảng **nat** trước chain **INPUT**, nên port publish **vượt qua ufw**. Với firewalld hiệu ứng tương tự (kiểm chứng trong lab)
+- firewalld: Docker tạo zone `docker` (target ACCEPT) và policy `docker-forwarding`
+- Backend mặc định là iptables. nftables (`firewall-backend`) còn experimental và không tự bật IP forwarding. Không đặt `"iptables": false`
+
+</div>
+
+```bash
+docker run -d --name web -p 127.0.0.1:8080:80 nginx
+firewall-cmd --get-active-zones     # có zone docker
+nft list ruleset | grep -i docker   # RHEL 9: iptables-nft
+docker exec web cat /etc/resolv.conf   # nameserver 127.0.0.11
+```
+
+</div>
+</div>
+
+<div class="outcome">🎯 <span><b>Đầu ra:</b> Kết nối được các container bằng user-defined network và publish port an toàn</span></div>
+
+---
+class: t2s
+---
+
+# Volume, bind mount và tmpfs
+
+<div class="card soft2 small mb-3">
+<b>Writable layer là tạm thời:</b> file tạo trong container nằm ở writable layer, phía trên các layer chỉ đọc của image. Layer này gắn riêng với từng container và <b>mất khi container bị xóa</b>.
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-3">
+<div class="tbl-xs">
+
+| Loại | Đặc điểm | Dùng cho |
+|---|---|---|
+| **Volume** | Daemon quản lý, còn lại sau khi xóa container | Database, dữ liệu bền vững (**khuyến nghị**) |
+| **Bind mount** | Nối thẳng đường dẫn host. Mặc định ghi được lên host | Mã nguồn khi dev, file cấu hình |
+| **tmpfs** | Nằm trong RAM, mất khi container dừng | Dữ liệu tạm, nhạy cảm |
+
+</div>
+<div class="card accent2 small">
+
+### <carbon-data-base /> Cú pháp --mount và -v
+
+- Nên dùng `--mount`: rõ ràng và đủ tùy chọn (volume driver, `volume-subpath`, Swarm)
+- `-v` tự tạo thư mục host nếu chưa có. `--mount` báo lỗi, trừ khi thêm `bind-create-src`
+- **RHEL/SELinux:** nhãn chỉ đặt được bằng `-v ...:Z` hoặc `:z`
+- Volume **rỗng** gắn vào thư mục có dữ liệu thì Docker copy dữ liệu vào (tắt bằng `volume-nocopy`). Bind mount thì **che** dữ liệu sẵn có
+
+</div>
+</div>
+<div class="flex flex-col gap-2">
+
+```bash
+docker volume create pgdata
+docker run -d --name db --mount \
+  type=volume,src=pgdata,dst=/var/lib/postgresql/data postgres:16
+docker run -d -v ./conf:/etc/nginx/conf.d:ro,Z nginx
+docker run -d --tmpfs /tmp:size=64m app
+docker volume ls ; docker volume inspect pgdata
+#  "Mountpoint": "/var/lib/docker/volumes/pgdata/_data"
+docker volume rm pgdata ; docker volume prune
+```
+
+<div class="card soft2 xs">
+<b>Anonymous volume</b> có tên ngẫu nhiên, vẫn còn sau khi xóa container (trừ khi chạy với <code>--rm</code>) và không tự được dùng lại. Volume <b>không bao giờ tự bị xóa</b>.
+</div>
+
+<div class="tip">
+<div class="tip-title">💡 Ví dụ trình bày: lưu dữ liệu như đồ dùng văn phòng</div>
+<b>Writable layer</b> là bảng nháp, bị xóa khi tan ca. <b>Volume</b> là ổ cứng gắn ngoài, đổi máy vẫn còn. <b>Bind mount</b> là cửa thông thẳng sang kho của host. <b>tmpfs</b> là giấy note trên bàn.
+</div>
+
+</div>
+</div>
+
+---
+class: t2s
+---
+
+# overlay2 và containerd image store
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+
+```mermaid {scale: 0.62}
+flowchart TB
+  L1[Layer image 1<br/>lowerdir · chỉ đọc] --> M[merged<br/>container nhìn thấy]
+  L2[Layer image 2<br/>lowerdir · chỉ đọc] --> M
+  U[Layer container<br/>upperdir · ghi được] --> M
+```
+
+```bash
+docker info | grep -E "Storage Driver|Backing Filesystem"
+docker info -f '{{ .DriverStatus }}'
+#   io.containerd.snapshotter.v1 nếu dùng containerd store
+docker system df -v   # Images · Containers · Volumes · Cache
+```
+
+</div>
+<div class="flex flex-col gap-3">
+<div class="card accent2 small">
+
+### <carbon-layers /> overlay2
+
+- OverlayFS ghép **lowerdir** (layer image, chỉ đọc) và **upperdir** (layer container, ghi được) thành **merged**. Tối đa 128 lower layer
+- Sửa file của lowerdir thì file được copy lên upperdir (copy-on-write). Xóa file thì tạo **whiteout**, file gốc vẫn nằm ở lowerdir
+- **RHEL:** xfs phải có `ftype=1`. Không sửa tay `/var/lib/docker`
+
+</div>
+<div class="card accent2 small">
+
+### <carbon-cube /> containerd image store
+
+- Từ **Docker Engine 29**, đây là mặc định cho bản **cài mới**. Bản nâng cấp vẫn chạy overlay2
+- Bật thủ công trong `/etc/docker/daemon.json`: `"features": {"containerd-snapshotter": true}`
+- Tốn đĩa hơn (giữ cả layer nén lẫn đã giải nén), lưu ở thư mục riêng (thường `/var/lib/containerd`), không dùng được với `userns-remap`
+
+</div>
+</div>
+</div>
+
+<div class="outcome">🎯 <span><b>Đầu ra:</b> Lưu được dữ liệu bền vững bằng volume và giải thích được cơ chế overlay2</span></div>
+
+---
+class: t2s
+---
+
+# Docker Compose: v2 và file compose.yaml
+
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="tbl-xs">
+
+| | Compose v1 | Compose v2 / v5 |
+|---|---|---|
+| Lệnh | `docker-compose` | `docker compose` (plugin) |
+| Viết bằng | Python | Go (v5 có thêm Go SDK) |
+| `version:` | 2.0 – 3.8 | Bỏ qua, đã lỗi thời |
+| Hỗ trợ | Hết sau 6/2023 | Đang hỗ trợ |
+
+</div>
+<div class="card accent2 small">
+
+### <carbon-flow /> Các phần tử chính
+
+- **services · networks · volumes · configs · secrets**. Configs và secrets gắn vào container dưới dạng **file**
+- `depends_on` có điều kiện `service_started`, `service_healthy`, `service_completed_successfully`. `restart: true` khởi động lại theo dependency
+- `$$` để container tự đánh giá biến, Compose không nội suy
+- `.env` nội suy biến **trong file Compose**, `env_file` đưa biến **vào container**
+- Project name: `name:`, `-p` hoặc `COMPOSE_PROJECT_NAME`
+
+</div>
+<div class="card soft2 xs">
+Tên file nên dùng <code>compose.yaml</code>. Cảnh báo "version is obsolete" thì xóa dòng <code>version:</code>. RHEL 9 cài gói <code>docker-compose-plugin</code>.
+</div>
+</div>
+<div class="code-xs">
+
+```yaml
+name: shop
+services:
+  web:
+    image: registry.company.vn/team/webapp:1.4.2
+    ports: ["8080:3000"]
+    environment: { DB_HOST: db }
+    depends_on:
+      db: { condition: service_healthy, restart: true }
+    deploy:
+      resources: { limits: { cpus: "0.5", memory: 512M } }
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_pass
+    secrets: [db_pass]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      retries: 5
+volumes:
+  pgdata: {}
+secrets:
+  db_pass: { file: ./db_pass.txt }
 ```
 
 </div>
 </div>
 
 ---
+class: t2s
+---
 
-# Volume, network và resource limit
+# Lệnh Compose, mạng mặc định và Podman Quadlet
 
-<div class="grid grid-cols-3 gap-3">
-<div class="card accent2 small">
-
-### <carbon-data-volume /> Volume
-
-Dữ liệu trong container mất khi container bị xóa, nên dữ liệu cần giữ phải để ngoài:
-
-- **Named volume**: Docker quản lý, dùng cho database
-- **Bind mount**: gắn thư mục host, tiện khi dev
-- **tmpfs**: nằm trên RAM, dữ liệu tạm
-
-</div>
-<div class="card accent2 small">
-
-### <carbon-network-4 /> Network
-
-- **bridge** (mặc định): mạng riêng trên host, ra ngoài qua NAT
-- **user-defined bridge**: container gọi nhau **bằng tên** nhờ DNS nội bộ
-- **host**: dùng chung mạng của host
-- **none**: không có mạng
-- `-p 8080:80`: publish port host 8080 → container 80
-
-</div>
-<div class="card accent2 small">
-
-### <carbon-meter /> Resource limit
-
-- `--memory 512m`: vượt giới hạn thì container bị **OOM kill**
-- `--cpus 1.5`: tối đa 1,5 core
-- `--pids-limit`: giới hạn số tiến trình
-- Không đặt limit thì một container có thể chiếm hết tài nguyên của host
-
-</div>
-</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
 
 ```bash
-docker network create appnet
-docker volume create pgdata
-docker run -d --name db  --network appnet -v pgdata:/var/lib/postgresql/data \
-  -e POSTGRES_PASSWORD_FILE=/run/secrets/db_pass --memory 1g --cpus 1 postgres:16
-docker run -d --name web --network appnet -p 8080:3000 \
-  -e DB_HOST=db --memory 512m --cpus 0.5 registry.company.vn/team/webapp:1.4.2
-docker stats                     # theo dõi CPU/RAM thực tế của từng container
+docker compose up -d           # tạo network, volume, chạy nền
+docker compose ps ; docker compose logs -f web
+docker compose exec web sh     # vào shell của service web
+docker compose config          # file đã hợp nhất + nội suy biến
+docker compose down            # xóa container + network
+docker compose down -v         # xóa luôn named volume ⚠
+docker compose watch           # đồng bộ code khi dev
 ```
+
+<div class="card accent2 small">
+
+### <carbon-network-3 /> Mạng mặc định
+
+- Compose tạo mạng `<project>_default` (bridge). Mỗi service có tên trong DNS nội bộ
+- Gọi nhau bằng **tên service** và **port trong container** (`db:5432`), không dùng port host
+- IP đổi khi container được tạo lại, nên luôn dùng tên. `network_mode: host` làm mất DNS theo tên service
+
+</div>
+
+<div class="tip">
+<div class="tip-title">💡 Compose là bản phối cho cả dàn nhạc</div>
+Một file mô tả từng nhạc công (<b>service</b>), sân khấu (<b>network</b>) và nhạc cụ riêng (<b>volume</b>). <code>up</code> là ra hiệu bắt đầu, <code>down</code> là thu dọn.
+</div>
+
+</div>
+<div class="flex flex-col gap-2">
+<div class="card accent2 small">
+
+### <logos-redhat-icon /> Podman trên RHEL 9
+
+- `podman compose` chỉ là lớp vỏ gọi provider bên ngoài (ưu tiên docker-compose nếu có). Đổi qua `compose_providers` hoặc `PODMAN_COMPOSE_PROVIDER`
+- **Quadlet** (Podman ≥ 4.6): chạy container bằng **systemd**, cách Red Hat hướng dẫn
+
+</div>
+
+<div class="code-xs">
+
+```bash
+# ~/.config/containers/systemd/web.container
+#   [Container]
+#   Image=registry.company.vn/team/webapp:1.4.2
+#   PublishPort=8080:3000
+#   Volume=webdata:/data:Z
+#   [Install]
+#   WantedBy=default.target
+systemctl --user daemon-reload  # generator sinh ra web.service
+systemctl --user start web      # container tên systemd-web
+loginctl enable-linger $USER    # chạy cả khi user không đăng nhập
+```
+
+</div>
+
+</div>
+</div>
+
+<div class="outcome">🎯 <span><b>Đầu ra:</b> Dựng được ứng dụng nhiều service bằng Compose và chạy container bằng systemd (Quadlet)</span></div>
 
 ---
 
@@ -1013,7 +1662,7 @@ docker stats                     # theo dõi CPU/RAM thực tế của từng co
 | 4 | User, group và permission | Tạo và phân quyền được theo đúng yêu cầu của ứng dụng | ✅ |
 | 5 | Service (systemd) và firewall | Quản lý được vòng đời dịch vụ; mở/đóng port theo yêu cầu | ✅ |
 | 6 | Hypervisor và vòng đời VM | Thao tác đầy đủ vòng đời VM trên hypervisor đang dùng | ✅ |
-| 7 | Container | Giải thích được cơ chế container và khác biệt so với VM trong 5 phút | ✅ |
+| 7 | Container: kiến trúc, image, Dockerfile, network, storage, Compose | Viết Dockerfile, chạy và kết nối nhiều container bằng Compose; giải thích được khác biệt với VM | ✅ |
 
 <div class="grid grid-cols-2 gap-4 mt-3">
 <div class="card soft small">

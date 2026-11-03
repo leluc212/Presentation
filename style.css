@@ -48,13 +48,13 @@
   gap: 0.4rem;
 }
 .slidev-layout h3 svg { color: var(--w1); }
-.slidev-layout:has(.eyebrow.t2) h3 svg { color: var(--w2); }
+.slidev-layout.t2s h3 svg { color: var(--w2); }
 
 .slidev-layout p { margin: 0.25rem 0 !important; line-height: 1.5; }
 .slidev-layout ul, .slidev-layout ol { margin: 0.15rem 0 !important; padding-left: 1.1rem; }
 .slidev-layout li { line-height: 1.45 !important; margin: 0.1rem 0 !important; }
 .slidev-layout li::marker { color: var(--w1); }
-.slidev-layout:has(.eyebrow.t2) li::marker { color: var(--w2); }
+.slidev-layout.t2s li::marker { color: var(--w2); }
 .slidev-layout strong, .slidev-layout b { color: var(--head); }
 
 /* ============ Nhãn chủ đề ============ */
@@ -161,7 +161,7 @@
   text-align: left;
   border-bottom: 1px solid var(--w1-line) !important;
 }
-.slidev-layout:has(.eyebrow.t2) th {
+.slidev-layout.t2s th {
   background: var(--w2-soft);
   color: #0f7c75;
   border-bottom-color: var(--w2-line) !important;
@@ -239,3 +239,8 @@
 
 .slidev-layout.end { letter-spacing: normal !important; text-transform: none !important; }
 .slidev-layout.end > * { letter-spacing: normal !important; }
+
+/* Bảng nhỏ cho slide nhiều nội dung */
+.tbl-xs table { font-size: 0.66rem; }
+.tbl-xs td, .tbl-xs th { padding: 0.2rem 0.5rem !important; }
+.code-xs pre, .code-xs .slidev-code { font-size: 0.58rem !important; line-height: 1.42 !important; }
