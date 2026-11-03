@@ -53,25 +53,6 @@ class: sec-w1
 
 ---
 
-# Mục tiêu Tuần 1 và tiêu chí đầu ra
-
-| # | Chủ đề | Tiêu chí đầu ra (theo roadmap) |
-|:-:|---|---|
-| 1 | Linux doanh nghiệp: CPU, RAM, disk, process | Kiểm tra và phân bổ được tài nguyên; giải thích được cho người khác |
-| 2 | Network: IP, routing, DNS, kết nối VM | Vẽ và giải thích được luồng kết nối mạng giữa các VM trong Lab |
-| 3 | Storage: partition, LVM, filesystem, mount | Tự thêm được disk mới, tạo LVM và mount vào hệ thống |
-| 4 | User, group và permission | Tạo và phân quyền được theo đúng yêu cầu của ứng dụng |
-| 5 | Service (systemd) và firewall | Quản lý được vòng đời dịch vụ; mở/đóng port theo yêu cầu |
-| 6 | Hypervisor và vòng đời VM | Thao tác đầy đủ vòng đời VM trên hypervisor đang dùng |
-
-<div class="grid grid-cols-3 gap-3 mt-3">
-<div class="card soft small"><b>Cách tiếp cận:</b> đo → xác định nút thắt (bottleneck) → phân bổ hoặc giới hạn.</div>
-<div class="card soft small"><b>Môi trường Lab:</b> 2 VM <code>vm-web</code> (nginx) và <code>vm-db</code> (mariadb) trên KVM / VirtualBox.</div>
-<div class="card soft small"><b>Mỗi chủ đề gồm:</b> lý thuyết, lệnh thực hành và một ví dụ dễ hiểu để trình bày.</div>
-</div>
-
----
-
 # CPU và Load Average
 
 <div class="grid grid-cols-2 gap-4">
@@ -202,8 +183,6 @@ sudo systemctl set-property nginx.service \
 <b>CPU</b> là đầu bếp, <b>load</b> là số món đang chờ nấu: 4 đầu bếp mà 8 món chờ là quá tải gấp đôi. <b>RAM</b> là mặt bàn bếp, <b>cache</b> là nguyên liệu bày sẵn, dọn đi được ngay. <b>%wa</b> cao là đầu bếp đứng chờ người lấy đồ trong kho (disk).
 </div>
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Kiểm tra và phân bổ được tài nguyên; giải thích được cho người khác</span></div>
 
 ---
 
@@ -350,8 +329,6 @@ flowchart LR
 </div>
 </div>
 
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Vẽ và giải thích được luồng kết nối mạng giữa các VM trong Lab</span></div>
-
 ---
 
 # Chuỗi lưu trữ, partition và LVM
@@ -442,8 +419,6 @@ thiết bị · mount point · loại FS · options (`defaults`, `noatime`, `nof
 </div>
 </div>
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Tự thêm được disk mới, tạo LVM và mount vào hệ thống</span></div>
 
 ---
 
@@ -545,8 +520,6 @@ sudo -l -U luc        # xem user được phép chạy gì
 <div class="tip-title">💡 Ví dụ trình bày: phân quyền như thẻ ra vào toà nhà</div>
 <b>User</b> là nhân viên, <b>group</b> là phòng ban, <b>rwx</b> là được xem, sửa, đi vào. Chỉ user <code>myapp</code> đọc được file mật khẩu DB (600), dev chỉ đọc log, deploy ghi code qua ACL. <b>sudo giới hạn</b> là thẻ chỉ mở đúng phòng cần thiết, không phải chìa khoá vạn năng.
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Tạo và phân quyền được theo đúng yêu cầu của ứng dụng</span></div>
 
 ---
 
@@ -653,8 +626,6 @@ ufw enable ; ufw status numbered ; ufw delete 3
 systemd cho dịch vụ vào ca khi boot (<b>enable</b>), tự gọi lại khi dịch vụ "ngã" (<b>Restart=on-failure</b>) và ghi sổ nhật ký (<b>journalctl</b>). Firewall mặc định đóng mọi cửa, chỉ mở 80/443 cho khách. Cửa 3306 của DB chỉ mở cho đúng vm-web, nhờ vậy bề mặt tấn công nhỏ nhất.
 </div>
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Quản lý được vòng đời dịch vụ; mở/đóng port theo yêu cầu</span></div>
 
 ---
 
@@ -782,8 +753,6 @@ Hypervisor là ban quản lý chia căn hộ (VM). <b>Snapshot</b> là chụp �
 </div>
 </div>
 
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Thao tác đầy đủ vòng đời VM trên hypervisor đang dùng</span></div>
-
 ---
 
 # Troubleshooting nhanh
@@ -907,8 +876,6 @@ flowchart LR
 <div class="tip-title">💡 Ví dụ trình bày: VM là nhà riêng, container là căn hộ</div>
 <b>VM</b> là nhà riêng, có móng riêng (kernel riêng). <b>Container</b> là căn hộ chung một móng (kernel host) nhưng có cửa khóa riêng (<b>namespace</b>) và công tơ điện nước riêng (<b>cgroups</b>). Nhẹ hơn và dọn vào nhanh hơn.
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Giải thích được cơ chế container và khác biệt so với VM trong 5 phút</span></div>
 
 ---
 class: t2s
@@ -1054,8 +1021,6 @@ Bị chặn <b>abuse limit</b> thì nhận lỗi 429 ngắn gọn. Hết <b>pull
 
 </div>
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Pull, tag, push image lên registry; quản lý được vòng đời container và dung lượng image</span></div>
 
 ---
 class: t2s
@@ -1262,8 +1227,6 @@ BuildKit là builder mặc định. <code>RUN --mount</code> có các kiểu bin
 </div>
 </div>
 
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Viết được Dockerfile multi-stage, tận dụng cache, không lộ bí mật và chạy non-root</span></div>
-
 ---
 class: t2s
 ---
@@ -1368,8 +1331,6 @@ docker exec web cat /etc/resolv.conf   # nameserver 127.0.0.11
 </div>
 </div>
 
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Kết nối được các container bằng user-defined network và publish port an toàn</span></div>
-
 ---
 class: t2s
 ---
@@ -1472,8 +1433,6 @@ docker system df -v   # Images · Containers · Volumes · Cache
 </div>
 </div>
 </div>
-
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Lưu được dữ liệu bền vững bằng volume và giải thích được cơ chế overlay2</span></div>
 
 ---
 class: t2s
@@ -1605,8 +1564,6 @@ loginctl enable-linger $USER    # chạy cả khi user không đăng nhập
 </div>
 </div>
 
-<div class="outcome">🎯 <span><b>Đầu ra:</b> Dựng được ứng dụng nhiều service bằng Compose và chạy container bằng systemd (Quadlet)</span></div>
-
 ---
 layout: end
 class: cover-dark
@@ -1615,10 +1572,6 @@ class: cover-dark
 <div class="flex flex-col h-full justify-center items-center text-center">
 
 # Cảm ơn anh/chị đã lắng nghe
-
-<div class="text-lg opacity-85 mt-2">Kế hoạch tiếp theo: ………………………………</div>
-
-<div class="mt-8"><span class="pill"><carbon-chat /> Hỏi & Đáp</span></div>
 
 <div class="mt-6 text-sm opacity-70">Lê Tấn Lực · Đỗ Hoàng Hiếu</div>
 
